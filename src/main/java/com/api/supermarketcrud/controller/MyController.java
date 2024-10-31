@@ -39,7 +39,7 @@ public class MyController {
 
     @PutMapping(value = "/count/batchTable/update", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object updateBatchTable(@RequestBody UpdateRq updateRq) {
-        return myServices.updateBatchTable(updateRq);
+        return myServices.updateBatchTable(updateRq);   
 
     }
 

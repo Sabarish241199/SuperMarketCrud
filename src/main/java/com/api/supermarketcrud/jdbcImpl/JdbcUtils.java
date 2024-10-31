@@ -3,7 +3,9 @@ package com.api.supermarketcrud.jdbcImpl;
 import com.api.supermarketcrud.Exceptions.ResourceNotFoundException;
 import com.api.supermarketcrud.model.ProductCost;
 import com.api.supermarketcrud.model.UpdateRq;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -119,6 +121,9 @@ public class JdbcUtils {
         return new ProductCost();
     }
 
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     public String updateBatchCount(UpdateRq updateRq) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -127,14 +132,9 @@ public class JdbcUtils {
         try {
             connection= DriverManager.getConnection(getUrl(), getStaticUserName(), getStaticPassword());
             String sql = "SET SQL_SAFE_UPDATES = 0";
-            preparedStatement = connection.prepareStatement(sql);
-            resultSet= preparedStatement.executeQuery();
+            jdbcTemplate.batchUpdate(sql);
             sql = "UPDATE batch" + " SET  Count = Count - " +updateRq.getCount()+  " WHERE Batch_No='" + updateRq.getBatch_No() + "' and Product='" + updateRq.getProduct()+"'" ;
-            preparedStatement = connection.prepareStatement(sql);
-            resultSet= preparedStatement.executeQuery();
-            sql="commit";
-            preparedStatement = connection.prepareStatement(sql);
-            resultSet= preparedStatement.executeQuery();
+            jdbcTemplate.batchUpdate(sql);
             return "Count is updated";
         }catch ( SQLException e){
             throw new ResourceNotFoundException(updateRq.getBatch_No() + " of product " + updateRq.getProduct() + " is Not found in Database or there is issue connecting to DB");
